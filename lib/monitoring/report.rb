@@ -1,4 +1,3 @@
-require 'usagewatch_ext'
 require 'rest-client'
 require 'json'
 require 'yaml'
@@ -10,11 +9,9 @@ module Monitoring
   class Report
     include Sys
     include ActionView::Helpers::NumberHelper
-    attr_reader :process_limit, :delay
-    def initialize(process_limit = 10, delay = 10)
-      puts "Hello, I'm on Report"
+    attr_reader :process_limit
+    def initialize(process_limit = 20)
       @process_limit = process_limit
-      @delay = delay
 
       if OS.linux?
         @cpu = CPU::Load.new
@@ -24,14 +21,12 @@ module Monitoring
 
     def get_metrics
       {
-        # limit: limit,
-        # delay: delay,
         hostname: hostname,
         cpu_usage: cpu_usage,
-        disk_usage: disk_usage,
-        token: ENV['server_token'],
+        total_disk_space: total_disk_space,
+        used_disk_space: used_disk_space,
         running_processes: processes
-      }
+      }.to_json
     end
 
     def hostname
@@ -43,25 +38,26 @@ module Monitoring
     end
 
     def cpu_usage
-      uw = Usagewatch
       if OS.linux?
-        @cpu.last_minute
+        "#{@cpu.last_minute}"
       else
-        uw.uw_cpuused
+        `ps -A -o %cpu | awk '{s+=$1} END {print s}'`
       end
     end
 
-    def disk_usage
-      used = number_to_human_size(disk_stat.bytes_used)
-      total = number_to_human_size(disk_stat.bytes_total)
-      return "#{used} of #{total}"
+    def total_disk_space
+      disk_stat.bytes_total
+    end
+
+    def used_disk_space
+      disk_stat.bytes_used
     end
 
     def processes
       if OS.linux?
         processes = `ps --no-headers aux | awk '{print $11, $2, $3, $4}' | sort -k3nr  | head -n #{process_limit}`
       else
-        processes = `ps aux | awk '{print $11, $2, $3, $4}' | sort -rk 3,3  | head -n #{process_limit}`
+        processes = `ps aux | awk '{print $11, $2, $3, $4}' | sort -k3nr  | head -n #{process_limit}`
       end
       headers = [:command, :pid, :cpu, :mem]
 
@@ -76,6 +72,14 @@ module Monitoring
         res << hsh
       end
       res
+    end
+
+    class << self
+      def publish
+        report = Report.new
+        metrics = report.get_metrics
+        MetricsBroadcastJob.perform_later(metrics)
+      end
     end
 
   end

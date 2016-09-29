@@ -1,0 +1,22 @@
+#metrics_table
+  h6
+    | Hostname : #{metrics['hostname']}
+  h6
+    | CPU Usage : #{number_to_percentage(metrics['cpu_usage'], precision: 2)}
+  h6
+    | Disk Usage : #{number_to_human_size(metrics['used_disk_space'])} of #{number_to_human_size(metrics['total_disk_space'])}
+  hr
+  table.table.table-bordered.table-hover role="table"
+    thead
+      tr
+        th Process Name
+        th PID
+        th % CPU
+        th % MEM
+    tbody
+      - metrics['running_processes'].each do |process|
+        tr
+          td = process['command']
+          td = process['pid']
+          td = process['cpu']
+          td = process['mem']
