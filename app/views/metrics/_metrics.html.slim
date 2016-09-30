@@ -10,6 +10,7 @@
     thead
       tr
         th Process Name
+        th User
         th PID
         th % CPU
         th % MEM
@@ -17,6 +18,7 @@
       - metrics['running_processes'].each do |process|
         tr
           td = process['command']
+          td = process['user']
           td = process['pid']
           td = process['cpu']
           td = process['mem']

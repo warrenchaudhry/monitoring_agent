@@ -3,4 +3,7 @@
     h2 Activity Monitor
     hr
   #metrics-info.row
-    == render partial: 'metrics', locals: {metrics: @metrics}
+    - if @metrics
+      == render partial: 'metrics', locals: {metrics: @metrics}
+    - else
+      p.lead Unable to retrieve data
