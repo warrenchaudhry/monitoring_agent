@@ -5,9 +5,9 @@ class MetricsBroadcastJob < ApplicationJob
   def perform(metrics)
     $redis.set("metrics", metrics)
     metrics = JSON.parse(metrics)
-    push_data(metrics)
     ActionCable.server.broadcast "metrics_channel",
                                  message: render_message(metrics)
+    push_data(metrics)
 
   end
   private
@@ -20,7 +20,11 @@ class MetricsBroadcastJob < ApplicationJob
     url = ENV['METRICS_URL']
     if (url =~ URI::regexp && ENV['SERVER_TOKEN'])
       uri = URI.join(url, 'api/v1/metrics')
-      RestClient.post uri.to_s, {metric: metrics}, content_type: :json, accept: :json, authorization: ENV['SERVER_TOKEN']
+      resp = RestClient.post uri.to_s, {metric: metrics}, content_type: :json, accept: :json, authorization: ENV['SERVER_TOKEN']
+      data = JSON.parse(resp)
+      if data['cpu_usage'] && data['cpu_usage']['on_limit'].to_s == 'true'
+        AlertBroadcastJob.perform_later(data['cpu_usage'])
+      end
     end
   end
 end

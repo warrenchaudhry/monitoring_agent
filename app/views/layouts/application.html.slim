@@ -5,7 +5,29 @@ html
     = csrf_meta_tags
     = action_cable_meta_tag
     = stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload'
+    = stylesheet_link_tag '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.css', 'data-turbolinks-track': 'reload'
     = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
+    = javascript_include_tag '//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.js', 'data-turbolinks-track': 'reload'
+
   body
     .container
       == yield
+
+    javascript:
+      toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "1500",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+      }

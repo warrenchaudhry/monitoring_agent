@@ -2,9 +2,11 @@
   h6
     | Hostname : #{metrics['hostname']}
   h6
-    | CPU Usage : #{number_to_percentage(metrics['cpu_usage'], precision: 2)}
+    | CPU Usage : #{number_to_percentage(metrics['cpu_usage'], precision: 2, strip_insignificant_zeros: true)}
   h6
     | Disk Usage : #{number_to_human_size(metrics['used_disk_space'])} of #{number_to_human_size(metrics['total_disk_space'])}
+  h6
+    | Time Fetched : #{metrics['fetch_time'].to_datetime.strftime('%a, %e %b %Y %H:%M:%S %z')}
   hr
   table.table.table-bordered.table-hover role="table"
     thead
