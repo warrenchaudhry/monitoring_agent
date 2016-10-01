@@ -17,10 +17,10 @@ class MetricsBroadcastJob < ApplicationJob
   end
 
   def push_data(metrics)
-    url = ENV['server_url']
-    if (url =~ URI::regexp && ENV['server_token'])
+    url = ENV['METRICS_URL']
+    if (url =~ URI::regexp && ENV['SERVER_TOKEN'])
       uri = URI.join(url, 'api/v1/metrics')
-      RestClient.post uri.to_s, {metric: metrics}, content_type: :json, accept: :json, authorization: ENV['server_token']
+      RestClient.post uri.to_s, {metric: metrics}, content_type: :json, accept: :json, authorization: ENV['SERVER_TOKEN']
     end
   end
 end

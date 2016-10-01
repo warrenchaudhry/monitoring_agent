@@ -1,2 +1,5 @@
-server_url: 'localhost:3000'
-server_token: 'placeyourtokenhere'
+METRICS_URL: 'http://localhost:3000/api/v1/metrics'
+SERVER_TOKEN: 'placeservertokenhere'
+SECRET_KEY_BASE: 'somerandomstringshouldbeputhere'
+HOST: 'http://localhost:3001'
+ACTION_CABLE_URL: 'wss://localhost:3001/cable'

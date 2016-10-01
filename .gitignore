@@ -20,3 +20,4 @@
 /config/application.yml
 .ruby-gemset
 dump.rdb
+/public/assets/*
